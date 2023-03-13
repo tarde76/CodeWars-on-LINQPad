@@ -8,31 +8,29 @@ public class ToSmallest
     public static long[] Smallest(long n)
     {
         var numberString = n.ToString();
-        var numbersList = new List<(long number, long removalIndex, long insertionIndex)>();
+        (long number, long removalIndex, long insertionIndex) smallest = (number: n, removalIndex: 0, insertionIndex: 0);
 
-        for (int i = 0; i < numberString.Length; i++)
-            generateCombinationsForIndex(i);
-
-        var smallestNumber = numbersList.OrderBy(x => x.number)
-                                        .ThenBy(x => x.removalIndex)
-                                        .ThenBy(x => x.insertionIndex)
-                                        .First();
-
-        return new long[] { smallestNumber.number, smallestNumber.removalIndex, smallestNumber.insertionIndex };
-
-        void generateCombinationsForIndex(int index)
-        {
-            var removedDigit = numberString[index];
-
-            var numberStringWithoutDigit = numberString.Remove(index, 1);
-            for (int i = 0; i <= numberStringWithoutDigit.Length; i++)
-            {
-                numbersList.Add((
-                    number: Convert.ToInt64(numberStringWithoutDigit.Insert(i, Char.ToString(removedDigit))),
-                    removalIndex: index,
-                    insertionIndex: i
-                ));
-            }
+        for (int i = 0; i < numberString.Length; i++){
+            var smallestForIndex = findSmallestForDigit(i);
+            smallest = smallest.CompareTo(smallestForIndex) > 0 ? smallestForIndex : smallest;
         }
+
+        (long number, long removalIndex, long insertionIndex) findSmallestForDigit(int index)  {
+
+            var removedDigit = numberString[index];
+            var numberWithoutRemovedDigit= numberString.Remove(index, 1);
+            (long number, long removalIndex, long insertionIndex) result = 
+                (number: n, removalIndex: index, insertionIndex: 0);
+                
+            for (int i = 0; i < numberString.Length; i++){
+                var current = Convert.ToInt64(numberWithoutRemovedDigit.Insert(i, removedDigit.ToString()));
+                if (result.number > current)    
+                    result = (number: current, removalIndex: index, insertionIndex: i);
+            }
+            return result;
+        };
+
+        return new long[] {smallest.number, smallest.removalIndex, smallest.insertionIndex};
+
     }
 }

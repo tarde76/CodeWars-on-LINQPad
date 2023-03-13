@@ -10,7 +10,7 @@ public class Program
         {
             Console.Write("Enter number: ");
             number = Console.ReadLine();
-            if (Int32.TryParse(number, out var parsedNumber))
+            if (Int64.TryParse(number, out var parsedNumber))
             {
                 var smallest = ToSmallest.Smallest(parsedNumber);
                 Console.WriteLine($"{parsedNumber} = [{String.Join(", ", smallest)}]");
