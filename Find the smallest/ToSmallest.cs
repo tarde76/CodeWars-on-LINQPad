@@ -7,30 +7,37 @@ public class ToSmallest
 {
     public static long[] Smallest(long n)
     {
-        var numberString = n.ToString();
-        (long number, long removalIndex, long insertionIndex) smallest = (number: n, removalIndex: 0, insertionIndex: 0);
+        long[] result = { n, 0, 0 };
+        var stringNumber = n.ToString();
 
-        for (int i = 0; i < numberString.Length; i++){
-            var smallestForIndex = findSmallestForDigit(i);
-            smallest = smallest.CompareTo(smallestForIndex) > 0 ? smallestForIndex : smallest;
+        for (int i = 0; i < stringNumber.Length; i++)
+        {
+            var removedDigit = stringNumber[i];
+            var numberWithoutRemovedDigit = stringNumber.Remove(i, 1);
+
+            for (int j = 0; j < stringNumber.Length; j++)
+            {
+                var numberAfterInsertion = Convert.ToInt64(numberWithoutRemovedDigit.Insert(j, removedDigit.ToString()));
+                if (numberAfterInsertion > result[0])
+                    continue;
+                if (numberAfterInsertion == result[0])
+                {
+                    if (result[1] > i)
+                    {
+                        result[1] = i;
+                        result[2] = j;
+                        continue;
+                    }
+                    if (result[1] == i)
+                        result[2] = Math.Min(result[2], j);
+                    continue;
+                }
+                result[0] = numberAfterInsertion;
+                result[1] = i;
+                result[2] = j;
+            }
         }
 
-        (long number, long removalIndex, long insertionIndex) findSmallestForDigit(int index)  {
-
-            var removedDigit = numberString[index];
-            var numberWithoutRemovedDigit= numberString.Remove(index, 1);
-            (long number, long removalIndex, long insertionIndex) result = 
-                (number: n, removalIndex: index, insertionIndex: 0);
-                
-            for (int i = 0; i < numberString.Length; i++){
-                var current = Convert.ToInt64(numberWithoutRemovedDigit.Insert(i, removedDigit.ToString()));
-                if (result.number > current)    
-                    result = (number: current, removalIndex: index, insertionIndex: i);
-            }
-            return result;
-        };
-
-        return new long[] {smallest.number, smallest.removalIndex, smallest.insertionIndex};
-
+        return result;
     }
 }
