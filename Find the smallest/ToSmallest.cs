@@ -18,23 +18,13 @@ public class ToSmallest
             for (int j = 0; j < stringNumber.Length; j++)
             {
                 var numberAfterInsertion = Convert.ToInt64(numberWithoutRemovedDigit.Insert(j, removedDigit.ToString()));
-                if (numberAfterInsertion > result[0])
-                    continue;
-                if (numberAfterInsertion == result[0])
+
+                if (numberAfterInsertion < result[0])
                 {
-                    if (result[1] > i)
-                    {
-                        result[1] = i;
-                        result[2] = j;
-                        continue;
-                    }
-                    if (result[1] == i)
-                        result[2] = Math.Min(result[2], j);
-                    continue;
+                    result[0] = numberAfterInsertion;
+                    result[1] = i;
+                    result[2] = j;
                 }
-                result[0] = numberAfterInsertion;
-                result[1] = i;
-                result[2] = j;
             }
         }
 
