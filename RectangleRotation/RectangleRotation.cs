@@ -4,61 +4,80 @@ public class Kata
 {
     public int RectangleRotation(int a, int b)
     {
-        //int shorterSide = Math.Min(a, b);
-        //var horizontalShift = b * Math.Sqrt(2) / 2;
-        double angleInDegrees = 45.0; 
-        double angleInRadians = angleInDegrees * (Math.PI / 180.0); 
-        double cosineValue = Math.Cos(angleInRadians); 
+        double positiveCoefficient, negativeCoefficient;
+        calculateFunctionsCoefficients(a, b, out positiveCoefficient, out negativeCoefficient);
 
-        double verticalShift = b / (2 * cosineValue);
-        double horizontalShift = a / (2 * cosineValue);
+        bool anyInRectangle = true;
+        int counter = 0;
 
-        bool inRectangleBoundsXPlusYPlus = true, inRectangleBoundsXPlusYMinus = true,
-             inRectangleBoundsXMinusYPLus = true, inRectangleBoundsXMinusYMinus = true;
+        return findAllPointsSimplyfied();
 
-        int result = 0;
-        int x = 0, y = 0, stepX = 0, stepY = 0;
-
-        do
+        int findAllPointsSimplyfied()
         {
-            do
+            counter = 1;
+            int offset = 1;
+            while (anyInRectangle)
             {
-                inRectangleBoundsXPlusYPlus = inRectangle((x + stepX, y + stepY));
-                inRectangleBoundsXPlusYMinus = stepY != 0 ? inRectangle((x, y - stepY)) : false;
-                inRectangleBoundsXMinusYPLus = x != 0 ? inRectangle((x - stepX, y)) : false;
-                inRectangleBoundsXMinusYMinus = stepY != 0 && x !=0 ? inRectangle((x - stepX, y - stepY)) : false;
+                anyInRectangle = inRectangle((0, offset));
+                anyInRectangle = inRectangle((0, -offset)) || anyInRectangle;
+                offset++;
+            }
 
-                stepX++;
-            } while (inRectangleBoundsXPlusYPlus || inRectangleBoundsXPlusYMinus ||
-                    inRectangleBoundsXMinusYPLus || inRectangleBoundsXMinusYMinus);
-            stepX = 0;
-            stepY++;
-            x++; 
-            y++;
+            int resultForYAxis = counter;
+            counter = 0;
 
-            inRectangleBoundsXPlusYPlus = inRectangle((x, y));
-            inRectangleBoundsXMinusYMinus = stepX != 0 && stepY != 0? inRectangle((x - stepX, y - stepY)) : false;
+            int xMax = (int)Math.Floor((positiveCoefficient + negativeCoefficient) / 2);
+            int startY = 0;
+            int x = 1;
+            while (x <= xMax)
+            {
+                int? maxYInRange = null, minYInRange = null;
+                offset = 0;
 
-        } while (inRectangleBoundsXPlusYPlus || inRectangleBoundsXMinusYMinus);
-
-        return result;
+                do
+                {
+                    anyInRectangle = false;
+                    if (inRectangle((x, startY + offset)))
+                    {
+                        anyInRectangle = true;
+                        maxYInRange = startY + offset;
+                        minYInRange ??= startY + offset;
+                    }
+                    if (offset > 0 && inRectangle((x, startY - offset)))
+                    {
+                        anyInRectangle = true;
+                        minYInRange = startY - offset;
+                    }
+                    offset++;
+                } while (anyInRectangle || offset == 1);
+                if (minYInRange != null && maxYInRange != null)
+                    startY = minYInRange.Value + ((maxYInRange.Value - minYInRange.Value) / 2);
+                x++;
+            }
+            return resultForYAxis + (counter * 2);
+        }
 
         bool inRectangle((int x, int y) point)
         {
-            // y = x + a    => y < x + a
-            // y = -x + a   => y < -x + a
-            // y = x - a    => y > x - a
-            // y = -x - a   => y > -x - a
-
-            if (point.y <= point.x + horizontalShift &&        // y < x + a
-                point.y >= point.x - horizontalShift &&        // y > x - a
-                point.y <= -point.x + verticalShift  &&    // y < -x + a
-                point.y >= -point.x - verticalShift)       // y > -x - a
+            if (point.y <= point.x + positiveCoefficient &&
+                point.y >= point.x - positiveCoefficient &&
+                point.y <= -point.x + negativeCoefficient &&
+                point.y >= -point.x - negativeCoefficient)
             {
-                result++;
+                counter++;
                 return true;
             };
             return false;
+        }
+
+        static void calculateFunctionsCoefficients(int a, int b, out double positiveCoefficient, out double negativeCoefficient)
+        {
+            double angleInDegrees = 45.0;
+            double angleInRadians = angleInDegrees * (Math.PI / 180.0);
+            double cosineValue = Math.Cos(angleInRadians);
+
+            positiveCoefficient = b / (2 * cosineValue);
+            negativeCoefficient = a / (2 * cosineValue);
         }
     }
 }
