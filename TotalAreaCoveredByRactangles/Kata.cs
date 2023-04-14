@@ -5,11 +5,11 @@ public class Kata
 
     public static long Calculate(IEnumerable<int[]> rectangles)
     {
-        var orderedRectangles = rectangles.Select(r => new Rectangle(r[0], r[1], r[2], r[3]))
-                                           .OrderBy(r => r.x0)
-                                           .ThenBy(r => r.y0)
-                                           .ThenByDescending(r => r.x1)
-                                           .ThenByDescending(r => r.y1);
+        var orderedRectangles = rectangles.Select(r => new Rectangle(r[0], r[1], r[2], r[3]));
+                                        //    .OrderBy(r => r.x0)
+                                        //    .ThenBy(r => r.y0)
+                                        //    .ThenByDescending(r => r.x1)
+                                        //    .ThenByDescending(r => r.y1);
 
         long totalArea = orderedRectangles
                                   .Select((r, index) => calculateArea(r) - 
